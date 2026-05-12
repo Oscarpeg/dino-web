@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🦕 Isla de los Dinosaurios</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', sans-serif; background: #0a0a1a; color: #e0e0e0; }
+  header { background: linear-gradient(135deg, #1a1a2e, #16213e); padding: 2rem; text-align: center; border-bottom: 2px solid #4CAF50; }
+  header h1 { font-size: 2.5rem; color: #4CAF50; }
+  header p { color: #aaa; margin-top: 0.5rem; }
+  nav { display: flex; justify-content: center; gap: 1rem; padding: 1rem; background: #111; }
+  nav a { color: #4CAF50; text-decoration: none; padding: 0.5rem 1.5rem; border: 1px solid #4CAF50; border-radius: 20px; transition: all 0.3s; }
+  nav a:hover { background: #4CAF50; color: #000; }
+  section { display: none; padding: 2rem; max-width: 1200px; margin: 0 auto; }
+  section.active { display: block; }
+  h2 { color: #4CAF50; margin-bottom: 1.5rem; font-size: 1.8rem; }
+  
+  /* Sección modelo */
+  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+  .metric-card { background: #1a1a2e; padding: 1.5rem; border-radius: 10px; border: 1px solid #333; text-align: center; }
+  .metric-card h3 { color: #4CAF50; font-size: 2rem; }
+  .metric-card p { color: #aaa; font-size: 0.9rem; }
+  .arch-box { background: #1a1a2e; padding: 1.5rem; border-radius: 10px; border: 1px solid #333; margin-bottom: 1rem; }
+  .arch-box h3 { color: #4CAF50; margin-bottom: 0.5rem; }
+  img.curve { width: 100%; max-width: 700px; border-radius: 10px; display: block; margin: 1rem auto; }
+
+  /* Sección ejemplos */
+  .dino-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+  .dino-card { background: #1a1a2e; border-radius: 12px; overflow: hidden; border: 1px solid #333; transition: transform 0.3s; }
+  .dino-card:hover { transform: translateY(-4px); }
+  .dino-card img { width: 100%; height: 200px; object-fit: cover; }
+  .dino-card-body { padding: 1rem; }
+  .dino-card-body h3 { color: #4CAF50; margin-bottom: 0.5rem; }
+  .dino-card-body p { font-size: 0.85rem; color: #bbb; line-height: 1.5; }
+  .tag { display: inline-block; background: #4CAF50; color: #000; font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; margin-bottom: 0.5rem; }
+
+  /* Sección interactiva */
+  .interactive-box { background: #1a1a2e; border-radius: 16px; padding: 2rem; max-width: 600px; margin: 0 auto; border: 1px solid #333; text-align: center; }
+  .btn-nuevo { background: #4CAF50; color: #000; border: none; padding: 1rem 3rem; font-size: 1.2rem; border-radius: 30px; cursor: pointer; font-weight: bold; transition: all 0.3s; margin: 1rem 0; }
+  .btn-nuevo:hover { background: #66BB6A; transform: scale(1.05); }
+  .btn-nuevo:disabled { background: #333; color: #666; cursor: not-allowed; transform: none; }
+  .result-nombre { font-size: 2rem; color: #4CAF50; font-weight: bold; margin: 1rem 0; min-height: 2.5rem; }
+  .result-desc { color: #bbb; font-size: 0.9rem; line-height: 1.6; margin: 1rem 0; min-height: 4rem; text-align: left; }
+  .result-img { width: 100%; border-radius: 12px; margin-top: 1rem; display: none; }
+  .steps { display: flex; justify-content: center; gap: 1rem; margin: 1rem 0; }
+  .step { padding: 0.3rem 1rem; border-radius: 20px; font-size: 0.8rem; background: #333; color: #666; }
+  .step.active { background: #4CAF50; color: #000; }
+  .step.done { background: #2e7d32; color: #fff; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🦕 Isla de los Dinosaurios</h1>
+  <p>Generador de nombres con RNN · Descripciones con Ollama · Imágenes con Difusión</p>
+</header>
+
+<nav>
+  <a href="#" onclick="showSection('modelo')">📊 Modelo</a>
+  <a href="#" onclick="showSection('ejemplos')">🦴 Ejemplos</a>
+  <a href="#" onclick="showSection('interactivo')">⚡ Nuevo Dino</a>
+</nav>
+
+<!-- SECCIÓN 1: MODELO -->
+<section id="modelo" class="active">
+  <h2>📊 Descripción del Modelo</h2>
+  <div class="metrics">
+    <div class="metric-card"><h3>1,536</h3><p>Dinosaurios de entrenamiento</p></div>
+    <div class="metric-card"><h3>29</h3><p>Tokens en vocabulario</p></div>
+    <div class="metric-card"><h3>0.5706</h3><p>Loss final (época 150)</p></div>
+    <div class="metric-card"><h3>865K</h3><p>Parámetros entrenables</p></div>
+    <div class="metric-card"><h3>1.7693</h3><p>Perplexity final</p></div>
+    <div class="metric-card"><h3>79.23%</h3><p>Accuracy por carácter</p></div>
+  </div>
+  <div class="arch-box">
+    <h3>Arquitectura</h3>
+    <p>Embedding (29→64) → LSTM (64→256, 2 capas, dropout 0.3) → Linear (256→29) → Softmax</p>
+    <p style="margin-top:0.5rem;color:#aaa">Decoder-only autorregresivo · CrossEntropyLoss ignorando PAD · Adam lr=0.003 · StepLR cada 50 épocas</p>
+  </div>
+  <div class="arch-box">
+    <h3>Muestreo</h3>
+    <p>Temperatura [0.7, 1.0, 2.5, 4.0] · Top-k (k=5, k=10) · Top-p nucleus (p=0.8, p=0.95) · Combinaciones mixtas</p>
+  </div>
+  <img class="curve" src="training_curve.png" alt="Curva de entrenamiento" onerror="this.style.display='none'">
+</section>
+
+<!-- SECCIÓN 2: EJEMPLOS -->
+<section id="ejemplos">
+  <h2>🦴 Dinosaurios Generados</h2>
+  <div class="dino-grid" id="dino-grid"></div>
+</section>
+
+<!-- SECCIÓN 3: INTERACTIVO -->
+<section id="interactivo">
+  <h2>⚡ Genera un Nuevo Dinosaurio</h2>
+  <div class="interactive-box">
+    <p style="color:#aaa">Haz clic para generar un nombre, descripción e imagen únicos</p>
+    <button class="btn-nuevo" id="btn-nuevo" onclick="generarDino()">🦕 Nuevo Dinosaurio</button>
+    <div class="steps">
+      <div class="step" id="step1">1. Nombre</div>
+      <div class="step" id="step2">2. Descripción</div>
+      <div class="step" id="step3">3. Imagen</div>
+    </div>
+    <div class="result-nombre" id="result-nombre"></div>
+    <div class="result-desc" id="result-desc"></div>
+    <img class="result-img" id="result-img" alt="Dinosaurio generado">
+  </div>
+</section>
+
+<script>
+const top10 = [
+  { nombre: "Tanystrosuchus", config: "Temperatura 0.7", desc: "El Tanystrosuchus era un dinosaurio grande y robusto que vivió en el Jurásico, hace 250 millones de años. Era un animal con una larga cola y cuello adaptado para alcanzar vegetación alta.", img: "Tanystrosuchus.png" },
+  { nombre: "Lignaveusaurus", config: "Temperatura 2.5", desc: "Lignaveusaurus era un dinosaurio que vivió en el período Jurásico, hace 250 millones de años. Era un animal con una larga cola y extremidades robustas.", img: "Lignaveusaurus.png" },
+  { nombre: "Poinavenator", config: "Temperatura 2.5", desc: "El Poinavenator era un dinosaurio carnívoro del Jurásico con garras afiladas y una constitución ágil y veloz.", img: "Poinavenator.png" },
+  { nombre: "Sinocalliopteryx", config: "Top-k=5", desc: "El Sinocalliopteryx era un dinosaurio de la época Jurásica, con una larga cola emplumada y cuerpo esbelto.", img: "Sinocalliopteryx.png" },
+  { nombre: "Araucanoraptor", config: "Top-k=5", desc: "El Araucanoraptor era un dinosaurio que vivió en la era Jurásica, animal grande y robusto con garras poderosas.", img: "Araucanoraptor.png" },
+  { nombre: "Macrophalangia", config: "Top-p=0.8", desc: "El Macrophalangia fue un dinosaurio de tamaño grande con dedos elongados que vivió en el Jurásico.", img: "Macrophalangia.png" },
+  { nombre: "Saurophaganax", config: "Top-p=0.8", desc: "El Saurophaganax fue un dinosaurio del Jurásico, gran depredador con una estructura ósea robusta.", img: "Saurophaganax.png" },
+  { nombre: "Becklespinax", config: "Top-p=0.95", desc: "Becklespinax era un dinosaurio carnívoro con espinas dorsales prominentes que vivió en el Cretácico.", img: "Becklespinax.png" },
+  { nombre: "Albertaceratops", config: "Top-k=10 Top-p=0.9", desc: "Albertaceratops vivió hace 125 millones de años en Alberta, con cuernos prominentes sobre los ojos.", img: "Albertaceratops.png" },
+  { nombre: "Mantellodon", config: "Top-k=10 Top-p=0.9", desc: "El Mantellodon era un dinosaurio herbívoro grande con dientes especializados que vivió en el Jurásico.", img: "Mantellodon.png" },
+];
+
+// Poblar grid de ejemplos
+const grid = document.getElementById('dino-grid');
+top10.forEach(d => {
+  grid.innerHTML += `
+    <div class="dino-card">
+      <img src="dinos/${d.img}" alt="${d.nombre}" onerror="this.src='https://placehold.co/300x200/1a1a2e/4CAF50?text=🦕'">
+      <div class="dino-card-body">
+        <span class="tag">${d.config}</span>
+        <h3>${d.nombre}</h3>
+        <p>${d.desc}</p>
+      </div>
+    </div>`;
+});
+
+function showSection(id) {
+  document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+async function generarDino() {
+  const btn = document.getElementById('btn-nuevo');
+  btn.disabled = true;
+  document.getElementById('result-img').style.display = 'none';
+  document.getElementById('result-desc').textContent = '';
+
+  // Paso 1: Nombre
+  setStep(1);
+  const r1 = await fetch('/api/nombre', { method: 'POST', headers: {'Content-Type':'application/json'}, body: '{}' });
+  const { nombre } = await r1.json();
+  document.getElementById('result-nombre').textContent = nombre;
+  setStep(2);
+
+  // Paso 2: Descripción
+  const r2 = await fetch('/api/descripcion', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ nombre }) });
+  const { descripcion } = await r2.json();
+  document.getElementById('result-desc').textContent = descripcion;
+  setStep(3);
+
+  // Paso 3: Imagen
+  const r3 = await fetch('/api/imagen', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ nombre, descripcion }) });
+  const { imagen } = await r3.json();
+  const img = document.getElementById('result-img');
+  img.src = imagen;
+  img.style.display = 'block';
+
+  doneSteps();
+  btn.disabled = false;
+}
+
+function setStep(n) {
+  for(let i = 1; i <= 3; i++) {
+    const el = document.getElementById(`step${i}`);
+    if(i < n) { el.className = 'step done'; el.textContent = `✓ ${i === 1 ? 'Nombre' : i === 2 ? 'Descripción' : 'Imagen'}`; }
+    else if(i === n) { el.className = 'step active'; }
+    else { el.className = 'step'; }
+  }
+}
+
+function doneSteps() {
+  ['step1','step2','step3'].forEach((id, i) => {
+    document.getElementById(id).className = 'step done';
+    document.getElementById(id).textContent = `✓ ${['Nombre','Descripción','Imagen'][i]}`;
+  });
+}
+</script>
+</body>
+</html>
