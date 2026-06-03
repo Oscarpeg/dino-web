@@ -8,8 +8,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-const OLLAMA_URL = "https://compare-exert-flying.ngrok-free.dev";
-const DIFFUSION_URL = "https://darkening-slashed-sixfold.ngrok-free.dev";
+const OLLAMA_URL = process.env.OLLAMA_URL;
+const DIFFUSION_URL = process.env.DIFFUSION_URL;
 
 app.post('/api/nombre', async (req, res) => {
     const sufijos = ['saurus', 'raptor', 'odon', 'venator', 'ceratops'];
